@@ -30,7 +30,6 @@ export default function GamePage() {
         ws.current.onclose = () => history.push("/");
         ws.current.onmessage = async e => {
             let msg = JSON.parse(e.data);
-            console.log(msg);
             if (msg.Type === "Game") setGame(msg.Payload);
             else if (msg.Type === "Network") setNetwork(msg.Payload);
             // else if (msg.Type === "Chat") setChat(c => c.concat([msg.Payload]));
@@ -166,7 +165,7 @@ export default function GamePage() {
                                                 <DropSpace key={ cIdx } row={ rIdx } col={ cIdx }>
                                                     <div className="box-border border border-zinc-100" style={{ width: `${tileSize}px`, height: `${tileSize}px` }}>
                                                         {
-                                                            el ? <Unit key={ rIdx + "," + cIdx} row={ rIdx } col={ cIdx } team={ el.Team ? el.Team : "" } type={ el.Type ? el.Type : "" } turn={ game.Turn } selectedTeam={ connected && network ? connected[network.Name] : "" } moveUnit={ moveUnit } switchUnits={ switchUnits } started={game ? game.MoreData.Started : false } board={ game ? game.MoreData.Board : [] } /> : <></>
+                                                            el ? <Unit key={ rIdx + "," + cIdx} row={ rIdx } col={ cIdx } team={ el.Team ? el.Team : "" } type={ el.Type ? el.Type : "" } turn={ game.Turn } selectedTeam={ connected && network ? connected[network.Name] : "" } moveUnit={ moveUnit } switchUnits={ switchUnits } started={game ? game.MoreData.Started : false } winners={ game ? game.Winners : [] } board={ game ? game.MoreData.Board : [] } /> : <></>
                                                         }
                                                     </div>
                                                 </DropSpace>) 
