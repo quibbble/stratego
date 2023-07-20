@@ -12,7 +12,6 @@ import { isMobile } from "react-device-detect";
 import DropSpace from "./game/DropSpace";
 import Unit, { TxtMap } from "./game/Unit";
 
-
 export default function GamePage() {
     const history = useHistory();
     const { gid } = useParams();
@@ -178,7 +177,7 @@ export default function GamePage() {
 
                         <div className="py-8 w-full flex justify-between items-center" style={{ height: `${tileSize}px` }}>
                             <div className="flex flex-col items-center text-zinc-400 max-w-[30%] md:max-w-[25%]">
-                                <div className="text-xs font-light italic mb-1 text-center">Swap units to reorder your board</div>
+                                <div className="text-xs font-light italic mb-1 text-center">Pre-game, swap your units to reorder board</div>
                                 <IoIosSwap />    
                             </div> 
                             <div className="flex flex-col items-center text-zinc-400 max-w-[30%] md:max-w-[25%]">

@@ -41,7 +41,7 @@ export default function Unit({ row, col, team, type, turn, selectedTeam, moveUni
         end: (item, monitor) => {
             const dropResult = monitor.getDropResult();
             if (item && dropResult) {
-                if (!started && board && board[dropResult.row][dropResult.col] !== null) {
+                if (!started && board && board[dropResult.row][dropResult.col] !== null && !(board[row][col].Type === "scout" && board[dropResult.row][dropResult.col].Team !== board[row][col].Team)) {
                     switchUnits(team, row, col, dropResult.row, dropResult.col)
                 } else {
                     moveUnit(team, row, col, dropResult.row, dropResult.col);
