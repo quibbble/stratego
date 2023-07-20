@@ -148,16 +148,16 @@ export default function GamePage() {
                 </div>
 
                 <DndProvider backend={ isMobile ? TouchBackend : HTML5Backend }>
-                    <div className="my-2 text-zinc-400 text-xs font-light italic text-right w-full">
-                        { 
-                            battle && battle.AttackingUnit && battle.AttackedUnit ? 
-                                <p>
-                                    <span className={`text-${battle.AttackingUnit.Team}-500`}>{battle.AttackingUnit.Type} ({TxtMap[battle.AttackingUnit.Type]})</span> attacked <span className={`text-${battle.AttackedUnit.Team}-500`}>{battle.AttackedUnit.Type} ({TxtMap[battle.AttackedUnit.Type]})</span> and { battle.WinningTeam === "" ? "tied" : battle.AttackingUnit.Team === battle.WinningTeam ? "won" : "lost" }
-                                </p> : <></> 
-                        }
-                    </div>
-
                     <div className="h-full flex flex-col justify-center items-center grow">
+                        <div className="py-4 text-zinc-400 text-xs font-light italic text-right w-full">
+                            { 
+                                battle && battle.AttackingUnit && battle.AttackedUnit ? 
+                                    <p>
+                                        <span className={`text-${battle.AttackingUnit.Team}-500`}>{battle.AttackingUnit.Type} ({TxtMap[battle.AttackingUnit.Type]})</span> attacked <span className={`text-${battle.AttackedUnit.Team}-500`}>{battle.AttackedUnit.Type} ({TxtMap[battle.AttackedUnit.Type]})</span> and { battle.WinningTeam === "" ? "tied" : battle.AttackingUnit.Team === battle.WinningTeam ? "won" : "lost" }
+                                    </p> : <></> 
+                            }
+                        </div>
+
                         <div className="box-border flex flex-col mb-4" style={{ width: `${ tileSize*10 }px`, height: `${ tileSize*10 }px` }}>
                             { 
                                 game ? game.MoreData.Board.map((row, rIdx) => 
@@ -176,16 +176,16 @@ export default function GamePage() {
                             }
                         </div>
 
-                        <div className="mb-4 w-full flex justify-between items-center" style={{ height: `${tileSize}px` }}>
-                            <div className="flex flex-col items-center text-zinc-400 max-w-[20%]">
+                        <div className="py-8 w-full flex justify-between items-center" style={{ height: `${tileSize}px` }}>
+                            <div className="flex flex-col items-center text-zinc-400 max-w-[30%] md:max-w-[25%]">
                                 <div className="text-xs font-light italic mb-1 text-center">Swap units to reorder your board</div>
                                 <IoIosSwap />    
                             </div> 
-                            <div className="flex flex-col items-center text-zinc-400 max-w-[20%]">
+                            <div className="flex flex-col items-center text-zinc-400 max-w-[30%] md:max-w-[25%]">
                                 <div className="text-xs font-light italic mb-1 text-center">Move unit to open space to start game</div>
                                 <BsArrowUp />    
                             </div>      
-                            <div className="flex flex-col items-center text-zinc-400 max-w-[20%]">
+                            <div className="flex flex-col items-center text-zinc-400 max-w-[30%] md:max-w-[25%]">
                                 <div className="text-xs font-light italic mb-1 text-center">Move unit onto enemy to attack</div>
                                 <LuSword />    
                             </div>
