@@ -2,9 +2,9 @@ import React from "react";
 import { useDrag } from "react-dnd";
 
 export const TxtMap = {
-    "flag": "",
-    "bomb": "",
-    "water": "",
+    "flag": "f",
+    "bomb": "b",
+    "water": "w",
     "spy": "s", 
     "scout": "1", 
     "miner": "2", 

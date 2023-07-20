@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { Adjectives, Nouns } from "./Words";
 import { CreateGame, Health } from "../api/API";
 import { useHistory } from "react-router-dom"
-import { IoMdInformationCircleOutline } from "react-icons/io"
 import Footer from "./Footer";
 
 export default function HomePage() {

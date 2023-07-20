@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { BsArrowUp, BsArrowLeft } from "react-icons/bs";
 import { IoIosSwap } from "react-icons/io"
-import { PiSword } from "react-icons"
+import { LuSword } from "react-icons/lu"
 import { CONFIG } from "../components/Config";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
@@ -152,7 +152,7 @@ export default function GamePage() {
                         { 
                             battle && battle.AttackingUnit && battle.AttackedUnit ? 
                                 <p>
-                                    <span className={`text-${battle.AttackingUnit.Team}-500`}>{battle.AttackingUnit.Type} ({TxtMap[battle.AttackingUnit.Type]})</span> attacked <span className={`text-${battle.AttackedUnit.Team}-500`}>{battle.AttackedUnit.Type} ({TxtMap[battle.AttackedUnit.Type]})</span> and {battle.AttackingUnit.Team === battle.WinningTeam ? "won" : "lost"}
+                                    <span className={`text-${battle.AttackingUnit.Team}-500`}>{battle.AttackingUnit.Type} ({TxtMap[battle.AttackingUnit.Type]})</span> attacked <span className={`text-${battle.AttackedUnit.Team}-500`}>{battle.AttackedUnit.Type} ({TxtMap[battle.AttackedUnit.Type]})</span> and { battle.WinningTeam === "" ? "tied" : battle.AttackingUnit.Team === battle.WinningTeam ? "won" : "lost" }
                                 </p> : <></> 
                         }
                     </div>
@@ -187,15 +187,9 @@ export default function GamePage() {
                             </div>      
                             <div className="flex flex-col items-center text-zinc-400 max-w-[20%]">
                                 <div className="text-xs font-light italic mb-1 text-center">Move unit onto enemy to attack</div>
-                                <PiSword />    
+                                <LuSword />    
                             </div>
                         </div>
-
-                        {/* <div className="my-4 flex text-zinc-400 font-light italic text-left w-full">
-                            <p className="text-xs">Drag & drop unit to move</p> 
-                            <BsArrowUp />
-                        </div> */}
-                        
                     </div>
                 </DndProvider>
 
