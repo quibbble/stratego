@@ -8,7 +8,6 @@ export default function HomePage() {
     const history = useHistory();
 
     const [gid, setGameID] = useState(`${ Adjectives[Math.floor(Math.random()*Adjectives.length)] }-${ Nouns[Math.floor(Math.random()*Nouns.length)] }`);
-    const [teams, setTeams] = useState(2);
 
     useEffect(() => {
         async function fetchHealth() {
@@ -20,7 +19,7 @@ export default function HomePage() {
 
     async function handleGo(e) {
         e.preventDefault();
-        let status = await CreateGame(gid, teams, null);
+        let status = await CreateGame(gid, 2, null);
         if (status === 201 || status === 400) history.push(`/${ gid }`);
     }
     return (
@@ -42,12 +41,6 @@ export default function HomePage() {
                         <div className="flex w-full justify-between flex-wrap">
                             <div className="italic text-xs bg-blue-500 py-1 px-2 order-2 md:order-1">
                                 <a href="https://quibbble.com">more <span className="quibbble text-sm not-italic">quibbble</span> games</a>
-                            </div>
-                            <div className="flex items-center order-1 md:order-2 mb-2 md:mb-0">
-                                <div className="mx-1 font-black text-blue-500">{ "PLAYERS" }</div>
-                                <select className="bg-zinc-800 text-xs h-6 border font-bold border-zinc-100 focus:outline-none" id="players" onChange={ e => setTeams(parseInt(e.target.value)) }>
-                                    { [2].map(el => <option key={ el } value={ el }>{ el }</option>) }
-                                </select>
                             </div>
                         </div>
                     </div>
