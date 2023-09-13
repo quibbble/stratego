@@ -22,24 +22,3 @@ html, body {
     @apply bg-zinc-800;
     @apply text-zinc-100;
 }
-
-p, h1, h2, h3, h4, h5, h6 {
-    margin: 0;
-    padding: 0;
-}
-
-.raleway {
-    font-family: "Raleway", sans-serif;
-}
-
-.title {
-    font-family: lobster, cursive;
-}
-
-.quibbble {
-    font-family: lobster, cursive;
-}
-
-.test {
-    border: 2px solid red
-}
