@@ -1,4 +1,4 @@
-# Tsuro
+# Stratego
 
 [![Netlify Status](https://api.netlify.com/api/v1/badges/acf3f86c-86f5-450c-ad99-aee5f4bdae68/deploy-status)](https://app.netlify.com/sites/stratego-quibbble/deploys)
 
