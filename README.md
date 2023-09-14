@@ -11,7 +11,7 @@ This repo contains [ReactJS](https://react.dev) frontend code and makes use of c
 ## Run Locally
 
 - Generate a personal `GITHUB_ACCESS_TOKEN` with package read permissions. Read more about it [here](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-npm-registry).
-- Create a `.npmrc` file in the `stratego` root director with the following:
+- Create a `.npmrc` file in the `stratego` root directory with the following:
 ```
 //npm.pkg.github.com/:_authToken=<GITHUB_ACCESS_TOKEN>
 @quibbble:boardgame=https://npm.pkg.github.com
