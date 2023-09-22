@@ -1,16 +1,16 @@
 import React from "react";
-import { useDrop } from "react-dnd";
+import { useDroppable } from '@dnd-kit/core';
 
 export default function DropSpace({row, col, children}) {
-    const [, drop] = useDrop(() => ({
-        accept: "unit",
-        drop: () => ({ row: row, col: col }),
-        collect: (monitor) => ({
-            isOver: monitor.isOver(),
-            canDrop: monitor.canDrop(),
-        }),
-    }));
+    const {isOver, setNodeRef} = useDroppable({
+        id: "space:" + row + "," + col,
+        data: {
+            row: row,
+            col: col
+        }
+    });
+
     return (
-        <div ref={drop}>{children}</div>
+        <div ref={ setNodeRef } className={ isOver ? "bg-zinc-500" : "" }>{ children }</div>
     )
 }

@@ -5,8 +5,8 @@ import { Game } from "./game/Game";
 
 const config = {
   // server attributes
-  host: process.env.REACT_APP_HOST,
-  websocket: process.env.REACT_APP_WEBSOCKET,
+  host: import.meta.env.VITE_HOST,
+  websocket: import.meta.env.VITE_WEBSOCKET,
 
   // game attributes
   key: "Stratego",

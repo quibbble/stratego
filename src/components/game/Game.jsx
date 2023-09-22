@@ -2,27 +2,30 @@ import React, { useEffect, useState, forwardRef, useCallback } from "react";
 import { BsArrowUp } from "react-icons/bs";
 import { IoIosSwap } from "react-icons/io"
 import { LuSword } from "react-icons/lu"
-import { DndProvider } from "react-dnd";
-import { HTML5Backend } from "react-dnd-html5-backend";
-import { TouchBackend } from "react-dnd-touch-backend";
-import { isMobile } from "react-device-detect";
 import DropSpace from "./DropSpace";
-import Unit, { TxtMap } from "./Unit";
+import { DraggableUnit, TxtMap } from "./Unit";
+import { DndContext, PointerSensor, useSensors, useSensor } from '@dnd-kit/core';
 
 export const Game = forwardRef((props, ref) => {
     // eslint-disable-next-line no-unused-vars
     const { ws, game, network, chat, connected, error } = props;
 
     // websocket messages
-    const switchUnits = (team, row, col, switchRow, switchCol) => {
+    const sendSwitchUnitsAction = useCallback((team, row, col, switchRow, switchCol) => {
         if (!ws.current) return;
         ws.current.send(JSON.stringify({"ActionType": "SwitchUnits", "Team": team, "MoreDetails": {"UnitRow": row, "UnitColumn": col, "SwitchUnitRow": switchRow, "SwitchUnitColumn": switchCol}}));
-    }
+    })
 
-    const moveUnit = (team, row, col, moveRow, moveCol) => {
+    const sendMoveUnitAction = useCallback((team, row, col, moveRow, moveCol) => {
         if (!ws.current) return;
         ws.current.send(JSON.stringify({"ActionType": "MoveUnit", "Team": team, "MoreDetails": {"UnitRow": row, "UnitColumn": col, "MoveRow": moveRow, "MoveColumn": moveCol}}));
-    }
+    })
+
+    // game data
+    const [team, setTeam] = useState();
+    useEffect(() => {
+        if (connected && network) setTeam(connected[network.Name])
+    }, [connected, network])
 
     // battle logic
     const [battle, setBattle] = useState({});
@@ -36,6 +39,33 @@ export const Game = forwardRef((props, ref) => {
             }
         }
     }, [game, setBattle])
+
+    // drag and drop
+    const sensors = useSensors(
+        useSensor(PointerSensor, {
+            activationConstraint: {
+                distance: 8,
+            },
+        })
+    )
+
+    const handleDragEnd = useCallback((e) => {
+        if (!game && !game.MoreData) return
+        if (!e.over || (game.MoreData.Started && team !== game.Turn) || game.Winners.length > 0) return
+
+        let over = e.over.data.current
+        let active = e.active.data.current
+
+        if (game && game.MoreData) {
+            let started = game.MoreData.Started
+            let board = game.MoreData.Board
+            if (!started && board[over.row][over.col] && !(active.type === "scout" && board[active.row][active.col].Team !== board[over.row][over.col].Team)) {
+                sendSwitchUnitsAction(team, active.row, active.col, over.row, over.col)
+            } else {
+                sendMoveUnitAction(team, active.row, active.col, over.row, over.col)
+            }
+        }
+    }, [team, game, sendMoveUnitAction, sendSwitchUnitsAction])
 
     // board resize logic
     const [tileSize, setTileSize] = useState(0);
@@ -54,7 +84,7 @@ export const Game = forwardRef((props, ref) => {
     }, [handleResize]);
 
     return (
-        <DndProvider backend={ isMobile ? TouchBackend : HTML5Backend }>
+        <DndContext onDragEnd={ handleDragEnd } sensors={ sensors }>
             <div className="h-full flex flex-col justify-center items-center grow">
                 <div className="py-4 text-zinc-400 text-xs font-light italic text-right w-full">
                     { 
@@ -74,7 +104,9 @@ export const Game = forwardRef((props, ref) => {
                                         <DropSpace key={ cIdx } row={ rIdx } col={ cIdx }>
                                             <div className="box-border border border-zinc-100" style={{ width: `${tileSize}px`, height: `${tileSize}px` }}>
                                                 {
-                                                    el ? <Unit key={ rIdx + "," + cIdx} row={ rIdx } col={ cIdx } team={ el.Team ? el.Team : "" } type={ el.Type ? el.Type : "" } turn={ game.Turn } selectedTeam={ connected && network ? connected[network.Name] : "" } moveUnit={ moveUnit } switchUnits={ switchUnits } started={game ? game.MoreData.Started : false } winners={ game ? game.Winners : [] } board={ game ? game.MoreData.Board : [] } /> : <></>
+                                                    el ? 
+                                                        <DraggableUnit key={ rIdx + "," + cIdx} row={ rIdx } col={ cIdx } team={ el.Team ? el.Team : "" } type={ el.Type ? el.Type : "" } turn={ game.Turn } selectedTeam={ team } started={game ? game.MoreData.Started : false } winners={ game ? game.Winners : [] } /> : 
+                                                        <></>
                                                 }
                                             </div>
                                         </DropSpace>) 
@@ -98,6 +130,6 @@ export const Game = forwardRef((props, ref) => {
                     </div>
                 </div>
             </div>
-        </DndProvider>
+        </DndContext>
     )
 })

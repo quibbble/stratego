@@ -1,5 +1,5 @@
-import React from "react";
-import { useDrag } from "react-dnd";
+import React, { forwardRef } from "react";
+import { useDraggable } from '@dnd-kit/core';
 
 export const TxtMap = {
     "flag": "f",
@@ -32,37 +32,42 @@ export const SvgMap = {
     "marshal": <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><g><rect fill="none" width="100" height="100"/><polygon points="53 23.24 60.9 23.4 54.61 28.17 56.9 35.73 50.42 31.22 43.94 35.74 46.22 28.18 39.93 23.41 47.82 23.25 50.41 15.79 53 23.24"/><polygon points="39.03 69.12 46.92 69.27 40.63 74.05 42.92 81.6 36.44 77.1 29.96 81.61 32.24 74.05 25.95 69.29 33.84 69.12 36.43 61.66 39.03 69.12"/><polygon points="77.46 42.41 85.36 42.56 79.07 47.34 81.36 54.89 74.88 50.39 68.4 54.9 70.68 47.34 64.39 42.58 72.28 42.41 74.87 34.95 77.46 42.41"/><polygon points="66.98 69.12 74.87 69.27 68.58 74.05 70.87 81.6 64.39 77.1 57.91 81.61 60.2 74.05 53.9 69.29 61.79 69.12 64.38 61.66 66.98 69.12"/><polygon points="28.54 42.41 36.43 42.56 30.15 47.34 32.44 54.89 25.95 50.39 19.48 54.9 21.76 47.34 15.46 42.58 23.36 42.41 25.94 34.95 28.54 42.41"/></g></svg>
 }
 
-export default function Unit({ row, col, team, type, turn, selectedTeam, moveUnit, switchUnits, started, winners, board }) {
+export function DraggableUnit({ row, col, team, type, turn, selectedTeam, started, winners }) {
+    const {attributes, isDragging, listeners, setNodeRef, transform} = useDraggable({
+        id: "unit:" + row + "," + col,
+        data: {
+            row: row,
+            col: col,
+            type: type
+        }
+    });
+
+    const style = {
+        opacity: isDragging ? 0.9 : undefined,
+        touchAction: "none",
+        transform: transform ? `translate3d(${transform.x}px, ${transform.y}px, 0)` : undefined
+    }
+
+    return (
+        <Unit ref={ setNodeRef } style={ style } 
+            {...attributes} {...listeners}
+            team={team} type={type} turn={turn} selectedTeam={selectedTeam} started={started} winners={winners} />
+    )
+}
+
+export const Unit = forwardRef(({ team, type, turn, selectedTeam, started, winners, ...props }, ref) => {
     const selectable = (!started && selectedTeam === team) || (started && winners.length === 0 && selectedTeam === turn && type !== "bomb" && type !== "flag" && type !== "water")
-    const [{opacity}, drag, preview] = useDrag(() => ({
-        type: "unit",
-        item: { type },
-        canDrag: () => selectable,
-        end: (item, monitor) => {
-            const dropResult = monitor.getDropResult();
-            if (item && dropResult) {
-                if (!started && board && board[dropResult.row][dropResult.col] !== null && !(board[row][col].Type === "scout" && board[dropResult.row][dropResult.col].Team !== board[row][col].Team)) {
-                    switchUnits(team, row, col, dropResult.row, dropResult.col)
-                } else {
-                    moveUnit(team, row, col, dropResult.row, dropResult.col);
-                }
-            }
-        },
-        collect: (monitor) => ({
-            opacity: monitor.isDragging() ? 0.4 : 1,
-        }),
-    }), [row, col, team, type, turn, selectedTeam, winners]);
 
     const bg = team ? `bg-${team}-500` : "bg-zinc-500"
     const cursor = selectable ? "cursor-pointer" : "cursor-default"
     const text = type ? TxtMap[type] : "?"
     const svg = type && SvgMap[type] ? SvgMap[type] : <></>
     return (
-        <div ref={ preview } className="w-full h-full">
-            <div ref={ drag } style={{ opacity }} className={ `relative w-full h-full flex items-center justify-center italic text-xs md:text-sm ${bg} ${cursor}` }>
+        <div ref={ ref } { ...props } className="w-full h-full">
+            <div className={ `relative w-full h-full flex items-center justify-center italic text-xs md:text-sm ${bg} ${cursor}` }>
                 <div className="absolute w-full h-full flex items-start justify-start p-1">{ text }</div>
                 <div className="w-[70%] h-[70%] flex items-center justify-center fill-zinc-100">{ svg }</div>
             </div>
         </div>
     )
-}
+})
