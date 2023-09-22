@@ -20,7 +20,7 @@ This repo contains [ReactJS](https://react.dev) frontend code and makes use of c
 - Run the quibbble server ([go-quibbble](https://github.com/quibbble/go-quibbble)) locally on port `8080`.
 - Create a `.env.local` file in the `stratego` root directory with the following:
 ```
-REACT_APP_HOST="http://127.0.0.1:8080"
-REACT_APP_WEBSOCKET="ws://127.0.0.1:8080"
+VITE_HOST="http://127.0.0.1:8080"
+VITE_WEBSOCKET="ws://127.0.0.1:8080"
 ```
 - Run `npm start`.
