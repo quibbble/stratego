@@ -1,6 +1,6 @@
-import React, { useState, useRef, createRef } from "react";
+import React, { useState, useEffect, useRef, createRef } from "react";
 import { Route, Routes, BrowserRouter } from "react-router-dom";
-import { GamePage, HomePage, DownPage } from "@quibbble/boardgame";
+import { GamePage, HomePage, DownPage, RulesPage } from "@quibbble/boardgame";
 import { Game } from "./game/Game";
 
 const config = {
@@ -32,6 +32,16 @@ export default function App() {
     const [connected, setConnected] = useState();
     const [error, setError] = useState();
   
+    const [rules, setRules] = useState("");
+
+    useEffect(() => {
+      import("./rules.md").then(res => {
+        fetch(res.default)
+        .then(response => response.text())
+        .then(text => setRules(text))
+      })
+    }, [])
+
     return (
       <BrowserRouter>
         <Routes>
@@ -51,6 +61,7 @@ export default function App() {
             }
           />
           <Route exact path="/status/down" element={ <DownPage config={ config } /> }/>
+          <Route exact path="/rules" element={ <RulesPage config={ config } rules={ rules } /> }/>
           <Route path="/" element={ <HomePage config={ config } /> } />
         </Routes>
       </BrowserRouter>
