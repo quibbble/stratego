@@ -30,13 +30,8 @@ export const Game = forwardRef((props, ref) => {
     // battle logic
     const [battle, setBattle] = useState({});
     useEffect(() => {
-        if (game && game.Actions) {
-            for (let action of game.Actions.reverse()) {
-                if (action.ActionType === "Battle") {
-                    setBattle(action.MoreDetails);
-                    return
-                }
-            }
+        if (game && game.MoreData && game.MoreData.Battle) {
+            setBattle(game.MoreData.Battle);
         }
     }, [game, setBattle])
 
