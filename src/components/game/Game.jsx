@@ -10,8 +10,6 @@ export const Game = forwardRef((props, ref) => {
     // eslint-disable-next-line no-unused-vars
     const { ws, game, network, chat, connected, error } = props;
 
-    console.log(game)
-
     // websocket messages
     const sendSwitchUnitsAction = useCallback((team, row, col, switchRow, switchCol) => {
         if (!ws.current) return;
