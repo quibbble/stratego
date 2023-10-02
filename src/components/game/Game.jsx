@@ -82,8 +82,12 @@ export const Game = forwardRef((props, ref) => {
         <DndContext onDragEnd={ handleDragEnd } sensors={ sensors }>
             <div className="h-full flex flex-col justify-center items-center grow">
                 <div className="py-4 text-zinc-400 text-xs font-light italic text-right w-full">
-                    <p className={ !(battle && battle.AttackingUnit && battle.AttackedUnit && game.MoreData.JustBattled) ? "opacity-0" : "" }>
-                        <span className={`text-${battle.AttackingUnit.Team}-500`}>{battle.AttackingUnit.Type} ({TxtMap[battle.AttackingUnit.Type]})</span> attacked <span className={`text-${battle.AttackedUnit.Team}-500`}>{battle.AttackedUnit.Type} ({TxtMap[battle.AttackedUnit.Type]})</span> and { battle.WinningTeam === "" ? "tied" : battle.AttackingUnit.Team === battle.WinningTeam ? "won" : "lost" }
+                    <p className={ !(battle && battle.AttackingUnit && battle.AttackedUnit && game && game.MoreData && game.MoreData.JustBattled) ? "opacity-0" : "" }>
+                        {
+                            battle && battle.AttackingUnit && battle.AttackedUnit ? <span>
+                                <span className={`text-${battle.AttackingUnit.Team}-500`}>{battle.AttackingUnit.Type} ({TxtMap[battle.AttackingUnit.Type]})</span> attacked <span className={`text-${battle.AttackedUnit.Team}-500`}>{battle.AttackedUnit.Type} ({TxtMap[battle.AttackedUnit.Type]})</span> and { battle.WinningTeam === "" ? "tied" : battle.AttackingUnit.Team === battle.WinningTeam ? "won" : "lost" }
+                            </span> : <></>
+                        }
                     </p>
                 </div>
 
