@@ -10,6 +10,8 @@ export const Game = forwardRef((props, ref) => {
     // eslint-disable-next-line no-unused-vars
     const { ws, game, network, chat, connected, error } = props;
 
+    console.log(game)
+
     // websocket messages
     const sendSwitchUnitsAction = useCallback((team, row, col, switchRow, switchCol) => {
         if (!ws.current) return;
@@ -82,12 +84,9 @@ export const Game = forwardRef((props, ref) => {
         <DndContext onDragEnd={ handleDragEnd } sensors={ sensors }>
             <div className="h-full flex flex-col justify-center items-center grow">
                 <div className="py-4 text-zinc-400 text-xs font-light italic text-right w-full">
-                    { 
-                        battle && battle.AttackingUnit && battle.AttackedUnit ? 
-                            <p>
-                                <span className={`text-${battle.AttackingUnit.Team}-500`}>{battle.AttackingUnit.Type} ({TxtMap[battle.AttackingUnit.Type]})</span> attacked <span className={`text-${battle.AttackedUnit.Team}-500`}>{battle.AttackedUnit.Type} ({TxtMap[battle.AttackedUnit.Type]})</span> and { battle.WinningTeam === "" ? "tied" : battle.AttackingUnit.Team === battle.WinningTeam ? "won" : "lost" }
-                            </p> : <></> 
-                    }
+                    <p className={ !(battle && battle.AttackingUnit && battle.AttackedUnit && game.MoreData.JustBattled) ? "opacity-0" : "" }>
+                        <span className={`text-${battle.AttackingUnit.Team}-500`}>{battle.AttackingUnit.Type} ({TxtMap[battle.AttackingUnit.Type]})</span> attacked <span className={`text-${battle.AttackedUnit.Team}-500`}>{battle.AttackedUnit.Type} ({TxtMap[battle.AttackedUnit.Type]})</span> and { battle.WinningTeam === "" ? "tied" : battle.AttackingUnit.Team === battle.WinningTeam ? "won" : "lost" }
+                    </p>
                 </div>
 
                 <div className="box-border flex flex-col mb-4" style={{ width: `${ tileSize*10 }px`, height: `${ tileSize*10 }px` }}>
@@ -96,7 +95,7 @@ export const Game = forwardRef((props, ref) => {
                             <div key={ rIdx } className="w-full h-full flex">
                                 {
                                     row.map((el, cIdx) => 
-                                        <DropSpace key={ cIdx } row={ rIdx } col={ cIdx }>
+                                        <DropSpace key={ cIdx } row={ rIdx } col={ cIdx } team={ game && game.Actions && game.Actions.length > 0 ? game.Actions[game.Actions.length-1].Team : "" } justMoved={ game && game.Actions && game.Actions.length > 0 && game.Actions[game.Actions.length-1].ActionType === "MoveUnit" && game.Actions[game.Actions.length-1].MoreDetails.UnitRow == rIdx && game.Actions[game.Actions.length-1].MoreDetails.UnitColumn == cIdx }>
                                             <div className="box-border border border-zinc-100" style={{ width: `${tileSize}px`, height: `${tileSize}px` }}>
                                                 {
                                                     el ? 
