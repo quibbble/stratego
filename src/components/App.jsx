@@ -10,7 +10,7 @@ const config = {
 
   // game attributes
   key: "Stratego",
-  variants: {},
+  variants: ["Classic", "Quick Battle"],
   minTeams: 2,
   maxTeams: 2,
 

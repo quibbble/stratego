@@ -2,6 +2,7 @@ import React, { useEffect, useState, forwardRef, useCallback } from "react";
 import { BsArrowUp } from "react-icons/bs";
 import { IoIosSwap } from "react-icons/io"
 import { LuSword } from "react-icons/lu"
+import { GiTrafficLightsReadyToGo } from "react-icons/gi"
 import DropSpace from "./DropSpace";
 import { DraggableUnit, TxtMap } from "./Unit";
 import { DndContext, PointerSensor, useSensors, useSensor } from '@dnd-kit/core';
@@ -14,6 +15,11 @@ export const Game = forwardRef((props, ref) => {
     const sendSwitchUnitsAction = useCallback((team, row, col, switchRow, switchCol) => {
         if (!ws.current) return;
         ws.current.send(JSON.stringify({"ActionType": "SwitchUnits", "Team": team, "MoreDetails": {"UnitRow": row, "UnitColumn": col, "SwitchUnitRow": switchRow, "SwitchUnitColumn": switchCol}}));
+    })
+
+    const sendToggleReadyAction = useCallback((team) => {
+        if (!ws.current) return;
+        ws.current.send(JSON.stringify({"ActionType": "ToggleReady", "Team": team}));
     })
 
     const sendMoveUnitAction = useCallback((team, row, col, moveRow, moveCol) => {
@@ -35,6 +41,14 @@ export const Game = forwardRef((props, ref) => {
         }
     }, [game, setBattle])
 
+    // variant logic
+    const [variant, setVariant] = useState("Classic");
+    useEffect(() => {
+        if (game && game.MoreData && game.MoreData.Variant) {
+            setVariant(game.MoreData.Variant);
+        }
+    }, [game, setVariant])
+
     // drag and drop
     const sensors = useSensors(
         useSensor(PointerSensor, {
@@ -52,13 +66,8 @@ export const Game = forwardRef((props, ref) => {
         let active = e.active.data.current
 
         if (game && game.MoreData) {
-            let started = game.MoreData.Started
-            let board = game.MoreData.Board
-            if (!started && board[over.row][over.col] && !(active.type === "scout" && board[active.row][active.col].Team !== board[over.row][over.col].Team)) {
-                sendSwitchUnitsAction(team, active.row, active.col, over.row, over.col)
-            } else {
-                sendMoveUnitAction(team, active.row, active.col, over.row, over.col)
-            }
+            if (!game.MoreData.Started) sendSwitchUnitsAction(team, active.row, active.col, over.row, over.col)
+            else sendMoveUnitAction(team, active.row, active.col, over.row, over.col)
         }
     }, [team, game, sendMoveUnitAction, sendSwitchUnitsAction])
 
@@ -66,10 +75,10 @@ export const Game = forwardRef((props, ref) => {
     const [tileSize, setTileSize] = useState(0);
 
     const handleResize = useCallback(() => {
-        const width = 10;
+        const width = variant === "QuickBattle" ? 8 : 10;
         if (!ref || !ref.current) return;
         else setTileSize(ref.current.clientWidth/width);
-    }, [ref])
+    }, [ref, variant])
 
     useEffect(() => handleResize());
 
@@ -81,17 +90,17 @@ export const Game = forwardRef((props, ref) => {
     return (
         <DndContext onDragEnd={ handleDragEnd } sensors={ sensors }>
             <div className="h-full flex flex-col justify-center items-center grow">
-                <div className="py-4 text-zinc-400 text-xs font-light italic text-right w-full">
+                <div className="py-2 text-zinc-400 text-xs font-light italic text-right w-full">
                     <p className={ !(battle && battle.AttackingUnit && battle.AttackedUnit && game && game.MoreData && game.MoreData.JustBattled) ? "opacity-0" : "" }>
                         {
                             battle && battle.AttackingUnit && battle.AttackedUnit ? <span>
                                 <span className={`text-${battle.AttackingUnit.Team}-500`}>{battle.AttackingUnit.Type} ({TxtMap[battle.AttackingUnit.Type]})</span> attacked <span className={`text-${battle.AttackedUnit.Team}-500`}>{battle.AttackedUnit.Type} ({TxtMap[battle.AttackedUnit.Type]})</span> and { battle.WinningTeam === "" ? "tied" : battle.AttackingUnit.Team === battle.WinningTeam ? "won" : "lost" }
-                            </span> : <></>
+                            </span> : <span>no recent battle</span>
                         }
                     </p>
                 </div>
 
-                <div className="box-border flex flex-col mb-4" style={{ width: `${ tileSize*10 }px`, height: `${ tileSize*10 }px` }}>
+                <div className="box-border flex flex-col mb-2" style={{ width: `${ tileSize*(variant === "QuickBattle" ? 8 : 10) }px`, height: `${ tileSize*(variant === "QuickBattle" ? 8 : 10) }px` }}>
                     { 
                         game ? game.MoreData.Board.map((row, rIdx) => 
                             <div key={ rIdx } className="w-full h-full flex">
@@ -100,7 +109,7 @@ export const Game = forwardRef((props, ref) => {
                                         <DropSpace key={ cIdx } row={ rIdx } col={ cIdx } team={ game && game.Actions && game.Actions.length > 0 ? game.Actions[game.Actions.length-1].Team : "" } justMoved={ game && game.Actions && game.Actions.length > 0 && game.Actions[game.Actions.length-1].ActionType === "MoveUnit" && game.Actions[game.Actions.length-1].MoreDetails.UnitRow == rIdx && game.Actions[game.Actions.length-1].MoreDetails.UnitColumn == cIdx }>
                                             <div className="box-border border border-zinc-100" style={{ width: `${tileSize}px`, height: `${tileSize}px` }}>
                                                 {
-                                                    el ? 
+                                                    el && !(el.Team === null && el.Type === "") ? 
                                                         <DraggableUnit key={ rIdx + "," + cIdx} row={ rIdx } col={ cIdx } team={ el.Team ? el.Team : "" } type={ el.Type ? el.Type : "" } turn={ game.Turn } selectedTeam={ team } started={game ? game.MoreData.Started : false } winners={ game ? game.Winners : [] } /> : 
                                                         <></>
                                                 }
@@ -111,19 +120,40 @@ export const Game = forwardRef((props, ref) => {
                     }
                 </div>
 
+                {
+                    connected && network && game && game.MoreData && !game.MoreData.Started ? 
+                        <div className="w-full flex justify-between mb-2">
+                            {
+                                game.Teams.map(team => <button key={ team } className={ `text-sm font-bold px-2 py-1 ${ connected[network.Name] == team ? `bg-${ team }-500` : `text-${ team }-500` }  ${connected[network.Name] === team ? "cursor-pointer" : "cursor-default" }` } onClick={ () => connected[network.Name] == team ? sendToggleReadyAction(team) : null }>
+                                    { game.MoreData.Ready[team] ? `${ team } ready!` : connected[network.Name] == team ? "click when ready" : `${ team } not ready` }
+                                </button>)
+                            }
+                        </div> : <></>
+                }
+
                 <div className="py-8 w-full flex justify-between items-center" style={{ height: `${tileSize}px` }}>
-                    <div className="flex flex-col items-center text-zinc-400 max-w-[30%] md:max-w-[25%]">
-                        <div className="text-xs font-light italic mb-1 text-center">Pre-game, swap your units to reorder board</div>
-                        <IoIosSwap />    
-                    </div> 
-                    <div className="flex flex-col items-center text-zinc-400 max-w-[30%] md:max-w-[25%]">
-                        <div className="text-xs font-light italic mb-1 text-center">Move unit to open space to start game</div>
-                        <BsArrowUp />    
-                    </div>      
-                    <div className="flex flex-col items-center text-zinc-400 max-w-[30%] md:max-w-[25%]">
-                        <div className="text-xs font-light italic mb-1 text-center">Move unit onto enemy to attack</div>
-                        <LuSword />    
-                    </div>
+                    {
+                        game && game.MoreData && !game.MoreData.Started ? 
+                            <>
+                                <div className="flex flex-col items-center text-zinc-400 max-w-[30%] md:max-w-[25%]">
+                                    <div className="text-xs font-light italic mb-1 text-center">Prepare for battle by arranging your units</div>
+                                    <IoIosSwap />    
+                                </div>
+                                <div className="flex flex-col items-center text-zinc-400 max-w-[30%] md:max-w-[25%]">
+                                    <div className="text-xs font-light italic mb-1 text-center">The games starts when both players are ready</div>
+                                    <GiTrafficLightsReadyToGo />    
+                                </div>
+                            </> : <>
+                                <div className="flex flex-col items-center text-zinc-400 max-w-[30%] md:max-w-[25%]">
+                                    <div className="text-xs font-light italic mb-1 text-center">Move unit to open space to start game</div>
+                                    <BsArrowUp />    
+                                </div>      
+                                <div className="flex flex-col items-center text-zinc-400 max-w-[30%] md:max-w-[25%]">
+                                    <div className="text-xs font-light italic mb-1 text-center">Move unit onto enemy to attack</div>
+                                    <LuSword />    
+                                </div>
+                            </>
+                    }
                 </div>
             </div>
         </DndContext>

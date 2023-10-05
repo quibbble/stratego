@@ -36,3 +36,15 @@ What to do on your turn:
 
 ## How to Win 🏆
 The game is won by the player who successfully captures their opponent's Flag. In the event that you can no longer move or attack then your opponent wins.
+
+## Variations 📍
+
+- **Classic**: Standard Stratego.
+- **Quick Battle**: Play on a 8x8 board with 10 units each:
+  - 1 Flag (marked f)
+  - 2 Bombs (marked b)
+  - 1 Spy (marked s)
+  - 2 Scouts (rank 1)
+  - 2 Miners (rank 2)
+  - 1 General (rank 8)
+  - 1 Marshal (rank 9)
