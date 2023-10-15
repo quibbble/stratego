@@ -90,15 +90,17 @@ export const Game = forwardRef((props, ref) => {
     return (
         <DndContext onDragEnd={ handleDragEnd } sensors={ sensors }>
             <div className="h-full flex flex-col justify-center items-center grow">
-                <div className="py-2 text-zinc-400 text-xs font-light italic text-right w-full">
-                    <p className={ !(battle && battle.AttackingUnit && battle.AttackedUnit && game && game.MoreData && game.MoreData.JustBattled) ? "opacity-0" : "" }>
-                        {
-                            battle && battle.AttackingUnit && battle.AttackedUnit ? <span>
-                                <span className={`text-${battle.AttackingUnit.Team}-500`}>{battle.AttackingUnit.Type} ({TxtMap[battle.AttackingUnit.Type]})</span> attacked <span className={`text-${battle.AttackedUnit.Team}-500`}>{battle.AttackedUnit.Type} ({TxtMap[battle.AttackedUnit.Type]})</span> and { battle.WinningTeam === "" ? "tied" : battle.AttackingUnit.Team === battle.WinningTeam ? "won" : "lost" }
-                            </span> : <span>no recent battle</span>
-                        }
-                    </p>
-                </div>
+                {
+                    game && game.MoreData.Started ? <div className="pb-2 text-zinc-400 text-xs font-light italic text-right w-full">
+                                <p className={ !(battle && battle.AttackingUnit && battle.AttackedUnit && game && game.MoreData && game.MoreData.JustBattled) ? "opacity-0" : "" }>
+                                    {
+                                        battle && battle.AttackingUnit && battle.AttackedUnit ? <span>
+                                            <span className={`text-${battle.AttackingUnit.Team}-500`}>{battle.AttackingUnit.Type} ({TxtMap[battle.AttackingUnit.Type]})</span> attacked <span className={`text-${battle.AttackedUnit.Team}-500`}>{battle.AttackedUnit.Type} ({TxtMap[battle.AttackedUnit.Type]})</span> and { battle.WinningTeam === "" ? "tied" : battle.AttackingUnit.Team === battle.WinningTeam ? "won" : "lost" }
+                                        </span> : <span>no recent battle</span>
+                                    }
+                                </p>
+                            </div> : <></>
+                }
 
                 <div className="box-border flex flex-col mb-2" style={{ width: `${ tileSize*(variant === "QuickBattle" ? 8 : 10) }px`, height: `${ tileSize*(variant === "QuickBattle" ? 8 : 10) }px` }}>
                     { 
@@ -122,7 +124,7 @@ export const Game = forwardRef((props, ref) => {
 
                 {
                     connected && network && game && game.MoreData && !game.MoreData.Started ? 
-                        <div className="w-full flex justify-between mb-2">
+                        <div className="w-full flex justify-between">
                             {
                                 game.Teams.map(team => <button key={ team } className={ `text-sm font-bold px-2 py-1 ${ connected[network.Name] == team ? `bg-${ team }-500` : `text-${ team }-500` }  ${connected[network.Name] === team ? "cursor-pointer" : "cursor-default" }` } onClick={ () => connected[network.Name] == team ? sendToggleReadyAction(team) : null }>
                                     { game.MoreData.Ready[team] ? `${ team } ready!` : connected[network.Name] == team ? "click when ready" : `${ team } not ready` }
@@ -131,7 +133,7 @@ export const Game = forwardRef((props, ref) => {
                         </div> : <></>
                 }
 
-                <div className="py-8 w-full flex justify-between items-center" style={{ height: `${tileSize}px` }}>
+                <div className="pt-4 w-full flex justify-between items-center" style={{ height: `${tileSize}px` }}>
                     {
                         game && game.MoreData && !game.MoreData.Started ? 
                             <>
