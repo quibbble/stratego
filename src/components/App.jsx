@@ -41,6 +41,11 @@ export default function App() {
         .then(text => setRules(text))
     }, [])
 
+    const [options, setOptions] = useState({
+      Seed: Date.now(),
+      Variant: config.variants.length > 0 ? config.variants[0] : null,
+    })
+
     return (
       <BrowserRouter>
         <Routes>
@@ -62,7 +67,7 @@ export default function App() {
           <Route exact path="/status/down" element={ <DownPage config={ config } /> }/>
           <Route exact path="/rules" element={ <RulesPage config={ config } rules={ rules } /> }/>
           <Route exact path="/bugs" element={ <BugsPage config={ config } /> }/>
-          <Route path="/" element={ <HomePage config={ config } /> } />
+          <Route path="/" element={ <HomePage config={ config } options={ options } setOptions={ setOptions } /> } />
         </Routes>
       </BrowserRouter>
     );
